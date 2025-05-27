@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Brain Tumor MRI Analysis - Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center mb-4">
+        <h1 class="display-4">Brain Tumor MRI Analysis</h1>
+        <p class="lead">Upload an MRI scan to detect and analyze brain tumors using artificial intelligence</p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Upload MRI Scan</h3>
+            </div>
+            <div class="card-body">
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file-upload" class="form-label">Select MRI Image (JPG, PNG)</label>
+                        <input class="form-control" type="file" id="file-upload" accept=".jpg, .jpeg, .png" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Analyze</button>
+                    </div>
+                </form>
+                
+                <div id="loading" class="text-center my-4" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Analyzing MRI scan...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center mt-4" id="result-section" style="display: none;">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h3 class="card-title mb-0">Analysis Results</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="text-center">
+                            <h4>Uploaded MRI Scan</h4>
+                            <img id="uploaded-image" class="img-fluid rounded border" alt="Uploaded MRI Scan">
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <h4>Diagnosis</h4>
+                        <div class="alert alert-primary">
+                            <h5 id="prediction-result">Prediction: <span id="prediction"></span></h5>
+                            <p>Confidence: <span id="confidence"></span>%</p>
+                        </div>
+                        
+                        <h4>Probability Distribution</h4>
+                        <div class="chart-container" style="position: relative; height:200px;">
+                            <canvas id="probability-chart"></canvas>
+                        </div>
+                        
+                        <h4 class="mt-4">Tumor Information</h4>
+                        <div class="accordion" id="tumorInfoAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingDescription">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDescription" aria-expanded="true" aria-controls="collapseDescription">
+                                        Description
+                                    </button>
+                                </h2>
+                                <div id="collapseDescription" class="accordion-collapse collapse show" aria-labelledby="headingDescription" data-bs-parent="#tumorInfoAccordion">
+                                    <div class="accordion-body" id="tumor-description">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingSymptoms">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSymptoms" aria-expanded="false" aria-controls="collapseSymptoms">
+                                        Common Symptoms
+                                    </button>
+                                </h2>
+                                <div id="collapseSymptoms" class="accordion-collapse collapse" aria-labelledby="headingSymptoms" data-bs-parent="#tumorInfoAccordion">
+                                    <div class="accordion-body">
+                                        <ul id="tumor-symptoms">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTreatment">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTreatment" aria-expanded="false" aria-controls="collapseTreatment">
+                                        Treatment Options
+                                    </button>
+                                </h2>
+                                <div id="collapseTreatment" class="accordion-collapse collapse" aria-labelledby="headingTreatment" data-bs-parent="#tumorInfoAccordion">
+                                    <div class="accordion-body" id="tumor-treatment">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingPrognosis">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePrognosis" aria-expanded="false" aria-controls="collapsePrognosis">
+                                        Prognosis
+                                    </button>
+                                </h2>
+                                <div id="collapsePrognosis" class="accordion-collapse collapse" aria-labelledby="headingPrognosis" data-bs-parent="#tumorInfoAccordion">
+                                    <div class="accordion-body" id="tumor-prognosis">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning mt-4">
+                            <strong>Disclaimer:</strong> This tool is for educational purposes only and should not be used for medical diagnosis. Always consult with a healthcare professional for proper diagnosis and treatment.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadForm = document.getElementById('upload-form');
+        const fileUpload = document.getElementById('file-upload');
+        const loading = document.getElementById('loading');
+        const resultSection = document.getElementById('result-section');
+        let probabilityChart = null;
+        
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const file = fileUpload.files[0];
+            if (!file) {
+                alert('Please select a file to upload');
+                return;
+            }
+            
+            // Show loading spinner
+            loading.style.display = 'block';
+            resultSection.style.display = 'none';
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Send request to server
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading spinner
+                loading.style.display = 'none';
+                
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                // Display results
+                resultSection.style.display = 'block';
+                
+                // Update image
+                document.getElementById('uploaded-image').src = '/' + data.file_path;
+                
+                // Update prediction
+                document.getElementById('prediction').textContent = data.prediction;
+                document.getElementById('confidence').textContent = (data.confidence * 100).toFixed(2);
+                
+                // Update tumor information
+                document.getElementById('tumor-description').textContent = data.tumor_info.description;
+                
+                // Update symptoms list
+                const symptomsList = document.getElementById('tumor-symptoms');
+                symptomsList.innerHTML = '';
+                data.tumor_info.symptoms.forEach(symptom => {
+                    const li = document.createElement('li');
+                    li.textContent = symptom;
+                    symptomsList.appendChild(li);
+                });
+                
+                // Update treatment and prognosis
+                document.getElementById('tumor-treatment').textContent = data.tumor_info.treatment;
+                document.getElementById('tumor-prognosis').textContent = data.tumor_info.prognosis;
+                
+                // Create probability chart
+                const ctx = document.getElementById('probability-chart').getContext('2d');
+                
+                // Destroy previous chart if it exists
+                if (probabilityChart) {
+                    probabilityChart.destroy();
+                }
+                
+                // Create new chart
+                const labels = Object.keys(data.class_probabilities);
+                const probabilities = Object.values(data.class_probabilities).map(p => p * 100);
+                
+                probabilityChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Probability (%)',
+                            data: probabilities,
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.6)',
+                                'rgba(255, 99, 132, 0.6)',
+                                'rgba(75, 192, 192, 0.6)',
+                                'rgba(255, 206, 86, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(255, 206, 86, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loading.style.display = 'none';
+                alert('An error occurred during analysis. Please try again.');
+            });
+        });
+    });
+</script>
+{% endblock %}

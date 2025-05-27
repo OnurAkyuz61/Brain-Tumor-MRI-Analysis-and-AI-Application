@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Brain Tumor MRI Analysis - About{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center mb-4">
+        <h1 class="display-4">About This Project</h1>
+        <p class="lead">Understanding brain tumor detection through MRI analysis</p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Project Overview</h3>
+            </div>
+            <div class="card-body">
+                <p>This application uses deep learning to analyze brain MRI scans and detect the presence and type of brain tumors. The model has been trained on the Brain Tumor MRI Dataset from Kaggle, which contains 7023 images of human brain MRI scans classified into four categories:</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-info text-white">
+                                Glioma
+                            </div>
+                            <div class="card-body">
+                                <p>Gliomas are tumors that develop from glial cells, which support and nourish neurons in the brain. They are the most common type of primary brain tumor.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-info text-white">
+                                Meningioma
+                            </div>
+                            <div class="card-body">
+                                <p>Meningiomas arise from the meninges, the membranes that surround the brain and spinal cord. They are typically slow-growing and often benign.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-info text-white">
+                                No Tumor
+                            </div>
+                            <div class="card-body">
+                                <p>MRI scans showing normal brain tissue without any tumor present.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-info text-white">
+                                Pituitary Tumor
+                            </div>
+                            <div class="card-body">
+                                <p>Pituitary tumors develop in the pituitary gland located at the base of the brain. They can affect hormone production and cause various symptoms.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow mt-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Technology</h3>
+            </div>
+            <div class="card-body">
+                <p>This application uses the following technologies:</p>
+                <ul>
+                    <li><strong>TensorFlow/Keras:</strong> For building and training the deep learning model</li>
+                    <li><strong>Transfer Learning:</strong> Using pre-trained MobileNetV2 as the base model</li>
+                    <li><strong>Flask:</strong> Python web framework for the backend</li>
+                    <li><strong>Bootstrap:</strong> For responsive and modern UI design</li>
+                    <li><strong>Chart.js:</strong> For visualizing prediction probabilities</li>
+                </ul>
+                
+                <h4 class="mt-4">Model Architecture</h4>
+                <p>The model uses transfer learning with MobileNetV2 as the base architecture, which has been pre-trained on the ImageNet dataset. Additional layers have been added on top of the base model for the specific task of brain tumor classification.</p>
+                
+                <h4 class="mt-4">Training Process</h4>
+                <p>The model was trained on the Brain Tumor MRI Dataset with data augmentation techniques to improve generalization. The training process included:</p>
+                <ul>
+                    <li>Image preprocessing and normalization</li>
+                    <li>Data augmentation (rotation, zoom, flip, etc.)</li>
+                    <li>Transfer learning from a pre-trained model</li>
+                    <li>Fine-tuning for the specific classification task</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card shadow mt-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Disclaimer</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h4 class="alert-heading">Important Notice</h4>
+                    <p>This application is developed for educational and research purposes only. It should not be used as a substitute for professional medical advice, diagnosis, or treatment.</p>
+                    <hr>
+                    <p class="mb-0">Always consult with a qualified healthcare provider for proper diagnosis and treatment of medical conditions. The predictions made by this application are based on a machine learning model and may not always be accurate.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow mt-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">Dataset</h3>
+            </div>
+            <div class="card-body">
+                <p>The model was trained on the Brain Tumor MRI Dataset from Kaggle, created by Masoud Nickparvar.</p>
+                <p>Dataset Link: <a href="https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset" target="_blank">Brain Tumor MRI Dataset</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
